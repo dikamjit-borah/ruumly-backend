@@ -36,12 +36,15 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   const port = envConfig.app.port;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 
+  const networkInterfaces = os.networkInterfaces();
   const ipAddress =
-    Object.values(os.networkInterfaces())
-      .flat()
-      .find((iface) => iface.family === 'IPv4' && !iface.internal)?.address || '0.0.0.0';
+    (networkInterfaces &&
+      Object.values(networkInterfaces)
+        .flat()
+        .find((iface) => iface && iface.family === 'IPv4' && !iface.internal)?.address) ||
+    '0.0.0.0';
 
   console.log(`Application is running on http://${ipAddress}:${port}/api`);
   console.log(`Health check: http://${ipAddress}:${port}/api/health`);
