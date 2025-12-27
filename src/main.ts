@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { envConfig } from './config/env.config';
+import os from 'os';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -37,12 +38,17 @@ async function bootstrap() {
   const port = envConfig.app.port;
   await app.listen(port);
 
-  console.log(`✅ Application is running on http://localhost:${port}/api`);
-  console.log(`🏥 Health check: http://localhost:${port}/api/health`);
-  console.log(`📝 API Documentation: http://localhost:${port}/api/docs`);
+  const ipAddress =
+    Object.values(os.networkInterfaces())
+      .flat()
+      .find((iface) => iface.family === 'IPv4' && !iface.internal)?.address || '0.0.0.0';
+
+  console.log(`Application is running on http://${ipAddress}:${port}/api`);
+  console.log(`Health check: http://${ipAddress}:${port}/api/health`);
+  console.log(`API Documentation: http://${ipAddress}:${port}/api/docs`);
 }
 
 bootstrap().catch((error) => {
-  console.error('❌ Failed to start application:', error);
+  console.error('Failed to start application:', error);
   process.exit(1);
 });

@@ -6,15 +6,15 @@ export const envConfig = {
   environment: process.env.NODE_ENV || 'development',
   app: {
     name: process.env.APP_NAME || 'Ruumly Backend',
-    port: parseInt(process.env.APP_PORT || '3000', 10),
+    port: parseInt(process.env.PORT || '3000', 10),
   },
   database: {
     type: (process.env.DB_TYPE || 'mongodb') as 'mongodb' | 'mysql',
     // MongoDB Configuration
     mongodb: {
-      uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/ruumly_db',
+      uri: process.env.MONGODB_URI,
     },
-    // MySQL Configuration (legacy)
+    // MySQL Configuration
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '3306', 10),
     username: process.env.DB_USERNAME || 'root',
