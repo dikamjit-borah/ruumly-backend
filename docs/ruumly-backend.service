@@ -1,0 +1,28 @@
+/**
+ * Production deployment configuration
+ * Example for AWS EC2 with systemd
+ */
+
+[Unit]
+Description=Ruumly Backend Node.js Application
+After=network.target
+
+[Service]
+Type=simple
+User=app
+WorkingDirectory=/home/app/ruumly-backend
+ExecStart=/usr/local/bin/node dist/main.js
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+Environment="NODE_ENV=production"
+Environment="APP_PORT=3000"
+
+# Resource limits
+MemoryMax=512M
+CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target
