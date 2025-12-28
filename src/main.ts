@@ -37,18 +37,19 @@ async function bootstrap() {
 
   const port = envConfig.app.port;
   await app.listen(port, '0.0.0.0');
+  const host = await app.getUrl();
 
-  /* const networkInterfaces = os.networkInterfaces();
-  const ipAddress =
-    (networkInterfaces &&
-      Object.values(networkInterfaces)
-        .flat()
-        .find((iface) => iface && iface.family === 'IPv4' && !iface.internal)?.address) ||
-    '0.0.0.0';
+  console.log(`Application is running on http://${host}/api`);
+  console.log(`Health check: http://${host}/api/health`);
+  logStartupConfig();
+}
+
+/**
+ * Log startup configuration and environment
  */
-  console.log(`Application is running on http://${'localhost'}:${port}/api`);
-  console.log(`Health check: http://${'localhost'}:${port}/api/health`);
-  console.log(`API Documentation: http://${'localhost'}:${port}/api/docs`);
+function logStartupConfig() {
+  console.log('APPLICATION STARTUP CONFIGURATION');
+  console.log(JSON.stringify(envConfig, null, 2));
 }
 
 bootstrap().catch((error) => {
