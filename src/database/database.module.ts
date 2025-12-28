@@ -5,7 +5,7 @@ import { envConfig } from '@/config/env.config';
 //import { LogSchema } from '@/database/logging/log.entity';
 
 // Sequelize SQL Entities
-import { User } from '@/database/sql/entities/user.entity';
+import { Owner } from '@/database/sql/entities/owner.entity';
 import { Property } from '@/database/sql/entities/property.entity';
 import { Room } from '@/database/sql/entities/room.entity';
 import { Tenant } from '@/database/sql/entities/tenant.entity';
@@ -25,7 +25,7 @@ import { Rent } from '@/database/sql/entities/rent.entity';
       username: envConfig.database.username,
       password: envConfig.database.password,
       database: envConfig.database.database,
-      models: [User, Property, Room, Tenant, Rent],
+      models: [Owner, Property, Room, Tenant, Rent],
       autoLoadModels: true,
       synchronize: false,
       logging: envConfig.database.logging ? console.log : false,
@@ -33,7 +33,7 @@ import { Rent } from '@/database/sql/entities/rent.entity';
     }),
 
     // Register SQL models for injection
-    SequelizeModule.forFeature([User, Property, Room, Tenant, Rent]),
+    SequelizeModule.forFeature([Owner, Property, Room, Tenant, Rent]),
   ],
 })
 export class DatabaseModule {}

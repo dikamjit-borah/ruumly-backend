@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { UsersModule } from './modules/users/users.module';
+import { OwnersModule } from './modules/owners/owners.module';
 import { HealthModule } from './modules/health/health.module';
 import { PropertiesModule } from './modules/properties/properties.module';
 import { RoomsModule } from './modules/rooms/rooms.module';
@@ -15,7 +15,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
   imports: [
     DatabaseModule,
     AuthModule,
-    UsersModule,
+    OwnersModule,
     HealthModule,
     PropertiesModule,
     RoomsModule,

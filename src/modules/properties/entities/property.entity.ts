@@ -19,7 +19,7 @@ export class Property extends Document {
   state: string;
 
   @Prop()
-  zipCode: string;
+  pinCode: string;
 
   @Prop()
   country: string;

@@ -5,7 +5,7 @@ import { envConfig } from '@/config/env.config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { UsersModule } from '@/modules/users/users.module';
+import { OwnersModule } from '@/modules/owners/owners.module';
 
 @Module({
   imports: [
@@ -14,7 +14,7 @@ import { UsersModule } from '@/modules/users/users.module';
       secret: envConfig.jwt.secret,
       signOptions: { expiresIn: 604800 }, // 7 days in seconds
     }),
-    UsersModule,
+    OwnersModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

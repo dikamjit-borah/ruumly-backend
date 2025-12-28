@@ -59,7 +59,7 @@ export class Property extends Model {
     type: DataType.STRING(20),
     allowNull: true,
   })
-  zipCode: string;
+  pinCode: string;
 
   @Column({
     type: DataType.STRING(100),

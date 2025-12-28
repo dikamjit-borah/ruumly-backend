@@ -21,7 +21,7 @@ export class CreatePropertyDto {
 
   @IsOptional()
   @IsString()
-  zipCode: string;
+  pinCode: string;
 
   @IsOptional()
   @IsString()
