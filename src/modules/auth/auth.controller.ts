@@ -2,6 +2,7 @@ import { Controller, Post, Body, HttpCode, HttpStatus, BadRequestException } fro
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { RegisterDto } from './dto/register.dto';
+import { FirebaseSignInDto } from './dto/firebase-signin.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -28,6 +29,16 @@ export class AuthController {
       );
     } catch (error) {
       throw new BadRequestException('Failed to register user');
+    }
+  }
+
+  @Post('firebase/signin')
+  @HttpCode(HttpStatus.OK)
+  async firebaseSignIn(@Body() firebaseSignInDto: FirebaseSignInDto) {
+    try {
+      return await this.authService.firebaseSignIn(firebaseSignInDto.idToken);
+    } catch (error) {
+      throw new BadRequestException('Firebase authentication failed');
     }
   }
 }

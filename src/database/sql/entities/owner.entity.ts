@@ -49,6 +49,12 @@ export class Owner extends Model {
   profile_picture: string;
 
   @Column({
+    type: DataType.STRING(255),
+    allowNull: true,
+  })
+  firebaseUid: string;
+
+  @Column({
     type: DataType.BOOLEAN,
     defaultValue: true,
   })

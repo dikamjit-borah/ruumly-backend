@@ -27,13 +27,29 @@ export const envConfig = {
       acquire: parseInt(process.env.DB_POOL_ACQUIRE || '30000', 10),
       idle: parseInt(process.env.DB_POOL_IDLE || '10000', 10),
     },
-    synchronize: process.env.NODE_ENV !== 'production',
-    logging: process.env.NODE_ENV !== 'production',
+    synchronize: process.env.DB_SYNCHRONIZE,
+    logging: process.env.DB_LOGGING,
   },
   jwt: {
     secret: process.env.JWT_SECRET || 'your_jwt_secret_key',
     expiresIn: process.env.JWT_EXPIRATION || '7d',
   },
+  firebase: (() => {
+    try {
+      if (!process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+        return null;
+      }
+      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+      // Fix escaped newlines in private_key
+      if (serviceAccount.private_key) {
+        serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+      }
+      return serviceAccount;
+    } catch (error) {
+      console.error('Invalid FIREBASE_SERVICE_ACCOUNT_JSON:', error);
+      return null;
+    }
+  })(),
   logging: {
     level: process.env.LOG_LEVEL || 'debug',
     dir: process.env.LOG_DIR || 'logs',

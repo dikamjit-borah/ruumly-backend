@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { OwnersService } from '@/modules/owners/owners.service';
+import { FirebaseService } from './firebase.service';
 import { AuthDto } from './dto/auth.dto';
 
 @Injectable()
@@ -9,6 +10,7 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly ownersService: OwnersService,
+    private readonly firebaseService: FirebaseService,
   ) {}
 
   async validateUser(email: string, password: string) {
@@ -64,5 +66,44 @@ export class AuthService {
 
   private async comparePasswords(password: string, hash: string): Promise<boolean> {
     return bcrypt.compare(password, hash);
+  }
+
+  async firebaseSignIn(idToken: string) {
+    try {
+      // Verify the Firebase ID token
+      const decodedToken = await this.firebaseService.verifyIdToken(idToken);
+
+      const email = decodedToken.email;
+      const firebaseUid = decodedToken.uid;
+
+      // Check if owner exists by email
+      let owner = await this.ownersService.findByEmail(email);
+
+      // If owner doesn't exist, create a new one
+      if (!owner) {
+        const name = decodedToken.name || email.split('@')[0];
+        owner = await this.ownersService.create({
+          email,
+          name,
+          firebaseUid,
+        } as any);
+      }
+
+      // Generate JWT token for the application
+      const payload = {
+        email: owner.email,
+        sub: owner.id,
+      };
+
+      const ownerData = owner.get({ plain: true });
+      delete ownerData.password;
+
+      return {
+        access_token: this.jwtService.sign(payload),
+        owner: ownerData,
+      };
+    } catch (error) {
+      throw new BadRequestException('Firebase authentication failed');
+    }
   }
 }

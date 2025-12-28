@@ -4,6 +4,7 @@ import { PassportModule } from '@nestjs/passport';
 import { envConfig } from '@/config/env.config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
+import { FirebaseService } from './firebase.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { OwnersModule } from '@/modules/owners/owners.module';
 
@@ -17,7 +18,7 @@ import { OwnersModule } from '@/modules/owners/owners.module';
     OwnersModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
-  exports: [AuthService, JwtModule],
+  providers: [AuthService, FirebaseService, JwtStrategy],
+  exports: [AuthService, FirebaseService, JwtModule],
 })
 export class AuthModule {}
