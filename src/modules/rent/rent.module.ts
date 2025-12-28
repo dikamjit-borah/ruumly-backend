@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { SequelizeModule } from '@nestjs/sequelize';
 import { RentService } from './rent.service';
 import { RentController } from './rent.controller';
-import { Rent, RentSchema } from './entities/rent.entity';
+import { Rent } from '@/database/sql/entities/rent.entity';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Rent.name, schema: RentSchema }])],
+  imports: [SequelizeModule.forFeature([Rent])],
   controllers: [RentController],
   providers: [RentService],
   exports: [RentService],

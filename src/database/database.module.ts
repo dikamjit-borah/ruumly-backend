@@ -1,28 +1,39 @@
 import { Module } from '@nestjs/common';
-//import { SequelizeModule } from '@nestjs/sequelize';
+import { SequelizeModule } from '@nestjs/sequelize';
 import { MongooseModule } from '@nestjs/mongoose';
 import { envConfig } from '@/config/env.config';
-import { User, UserSchema } from '@/modules/users/entities/user.entity';
+import { LogSchema } from '@/database/logging/log.entity';
+
+// Sequelize SQL Entities
+import { User } from '@/database/sql/entities/user.entity';
+import { Property } from '@/database/sql/entities/property.entity';
+import { Room } from '@/database/sql/entities/room.entity';
+import { Tenant } from '@/database/sql/entities/tenant.entity';
+import { Rent } from '@/database/sql/entities/rent.entity';
 
 @Module({
   imports: [
-    // MongoDB - Primary database for storage
+    // MongoDB - For Logging
     MongooseModule.forRoot(envConfig.database.mongodb.uri),
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-    // Sequelize - Available for future use (not active)
-    // Uncomment below when ready to use SQL database alongside MongoDB
-    // SequelizeModule.forRoot({
-    //   dialect: 'mysql',
-    //   host: envConfig.database.host,
-    //   port: envConfig.database.port,
-    //   username: envConfig.database.username,
-    //   password: envConfig.database.password,
-    //   database: envConfig.database.database,
-    //   autoLoadModels: true,
-    //   synchronize: envConfig.database.synchronize,
-    //   logging: envConfig.database.logging ? console.log : false,
-    //   pool: envConfig.database.pool,
-    // }),
+    MongooseModule.forFeature([{ name: 'Log', schema: LogSchema }]),
+
+    // Sequelize MySQL - For Primary Data Storage
+    SequelizeModule.forRoot({
+      dialect: 'mysql',
+      host: envConfig.database.host,
+      port: envConfig.database.port,
+      username: envConfig.database.username,
+      password: envConfig.database.password,
+      database: envConfig.database.database,
+      models: [User, Property, Room, Tenant, Rent],
+      autoLoadModels: true,
+      synchronize: envConfig.database.synchronize,
+      logging: envConfig.database.logging ? console.log : false,
+      pool: envConfig.database.pool,
+    }),
+
+    // Register SQL models for injection
+    SequelizeModule.forFeature([User, Property, Room, Tenant, Rent]),
   ],
 })
 export class DatabaseModule {}

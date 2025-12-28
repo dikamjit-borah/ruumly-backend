@@ -1,31 +1,29 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Property } from './entities/property.entity';
+import { InjectModel } from '@nestjs/sequelize';
+import { Property } from '@/database/sql/entities/property.entity';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
 
 @Injectable()
 export class PropertiesService {
   constructor(
-    @InjectModel(Property.name)
-    private propertyModel: Model<Property>,
+    @InjectModel(Property)
+    private propertyModel: typeof Property,
   ) {}
 
   async create(createPropertyDto: CreatePropertyDto, ownerId: string): Promise<Property> {
-    const property = new this.propertyModel({
+    return this.propertyModel.create({
       ...createPropertyDto,
       ownerId,
-    });
-    return property.save();
+    } as any);
   }
 
   async findAll(ownerId: string): Promise<Property[]> {
-    return this.propertyModel.find({ ownerId }).exec();
+    return this.propertyModel.findAll({ where: { ownerId } });
   }
 
   async findOne(id: string): Promise<Property> {
-    const property = await this.propertyModel.findById(id).exec();
+    const property = await this.propertyModel.findByPk(id);
     if (!property) {
       throw new NotFoundException(`Property with ID ${id} not found`);
     }
@@ -33,19 +31,18 @@ export class PropertiesService {
   }
 
   async update(id: string, updatePropertyDto: UpdatePropertyDto): Promise<Property> {
-    const property = await this.propertyModel
-      .findByIdAndUpdate(id, updatePropertyDto, { new: true })
-      .exec();
+    const property = await this.propertyModel.findByPk(id);
     if (!property) {
       throw new NotFoundException(`Property with ID ${id} not found`);
     }
-    return property;
+    return property.update(updatePropertyDto);
   }
 
   async remove(id: string): Promise<void> {
-    const result = await this.propertyModel.findByIdAndDelete(id).exec();
-    if (!result) {
+    const property = await this.propertyModel.findByPk(id);
+    if (!property) {
       throw new NotFoundException(`Property with ID ${id} not found`);
     }
+    await property.destroy();
   }
 }

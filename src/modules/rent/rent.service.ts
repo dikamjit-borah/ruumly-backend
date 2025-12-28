@@ -1,43 +1,37 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Rent } from './entities/rent.entity';
+import { InjectModel } from '@nestjs/sequelize';
+import { Op } from 'sequelize';
+import { Rent } from '@/database/sql/entities/rent.entity';
 import { CreateRentDto } from './dto/create-rent.dto';
 import { UpdateRentDto } from './dto/update-rent.dto';
 
 @Injectable()
 export class RentService {
   constructor(
-    @InjectModel(Rent.name)
-    private rentModel: Model<Rent>,
+    @InjectModel(Rent)
+    private rentModel: typeof Rent,
   ) {}
 
   async create(createRentDto: CreateRentDto): Promise<Rent> {
-    const rent = new this.rentModel({
+    return this.rentModel.create({
       ...createRentDto,
       status: 'pending',
-    });
-    return rent.save();
+    } as any);
   }
 
   async findAll(propertyId?: string): Promise<Rent[]> {
-    const query = propertyId ? { propertyId } : {};
-    return this.rentModel
-      .find(query)
-      .populate('tenantId')
-      .populate('roomId')
-      .populate('propertyId')
-      .sort({ dueDate: -1 })
-      .exec();
+    const where = propertyId ? { propertyId } : {};
+    return this.rentModel.findAll({
+      where,
+      include: ['tenant', 'room', 'property'],
+      order: [['dueDate', 'DESC']],
+    });
   }
 
   async findOne(id: string): Promise<Rent> {
-    const rent = await this.rentModel
-      .findById(id)
-      .populate('tenantId')
-      .populate('roomId')
-      .populate('propertyId')
-      .exec();
+    const rent = await this.rentModel.findByPk(id, {
+      include: ['tenant', 'room', 'property'],
+    });
     if (!rent) {
       throw new NotFoundException(`Rent with ID ${id} not found`);
     }
@@ -45,23 +39,19 @@ export class RentService {
   }
 
   async update(id: string, updateRentDto: UpdateRentDto): Promise<Rent> {
-    const rent = await this.rentModel
-      .findByIdAndUpdate(id, updateRentDto, { new: true })
-      .populate('tenantId')
-      .populate('roomId')
-      .populate('propertyId')
-      .exec();
+    const rent = await this.rentModel.findByPk(id);
     if (!rent) {
       throw new NotFoundException(`Rent with ID ${id} not found`);
     }
-    return rent;
+    return rent.update(updateRentDto);
   }
 
   async remove(id: string): Promise<void> {
-    const result = await this.rentModel.findByIdAndDelete(id).exec();
-    if (!result) {
+    const rent = await this.rentModel.findByPk(id);
+    if (!rent) {
       throw new NotFoundException(`Rent with ID ${id} not found`);
     }
+    await rent.destroy();
   }
 
   async recordPayment(
@@ -70,46 +60,42 @@ export class RentService {
     paymentMethod: string,
     transactionId?: string,
   ): Promise<Rent> {
-    const rent = await this.rentModel.findById(id).exec();
+    const rent = await this.rentModel.findByPk(id);
     if (!rent) {
       throw new NotFoundException(`Rent with ID ${id} not found`);
     }
 
-    const newAmountPaid = rent.amountPaid + amountPaid;
-    const status =
-      newAmountPaid >= rent.amount ? 'paid' : newAmountPaid > 0 ? 'partial' : 'pending';
+    const newAmountPaid = Number(rent.amountPaid) + amountPaid;
+    const amount = Number(rent.amount);
+    const status = newAmountPaid >= amount ? 'paid' : newAmountPaid > 0 ? 'partial' : 'pending';
 
-    return this.rentModel
-      .findByIdAndUpdate(
-        id,
-        {
-          amountPaid: newAmountPaid,
-          status,
-          paymentMethod,
-          transactionId: transactionId || rent.transactionId,
-          paidDate: status === 'paid' ? new Date() : rent.paidDate,
-        },
-        { new: true },
-      )
-      .populate('tenantId')
-      .populate('roomId')
-      .populate('propertyId')
-      .exec();
+    return rent.update({
+      amountPaid: newAmountPaid,
+      status,
+      paymentMethod,
+      transactionId: transactionId || rent.transactionId,
+      paidDate: status === 'paid' ? new Date() : rent.paidDate,
+    } as any);
   }
 
   async getPendingRent(propertyId: string): Promise<Rent[]> {
-    return this.rentModel
-      .find({ propertyId, status: { $in: ['pending', 'overdue', 'partial'] } })
-      .populate('tenantId')
-      .populate('roomId')
-      .sort({ dueDate: 1 })
-      .exec();
+    return this.rentModel.findAll({
+      where: {
+        propertyId,
+        status: { [Op.in]: ['pending', 'overdue', 'partial'] },
+      },
+      include: ['tenant', 'room'],
+      order: [['dueDate', 'ASC']],
+    });
   }
 
   async getRentStats(propertyId: string) {
-    const rents = await this.rentModel.find({ propertyId }).exec();
-    const totalRent = rents.reduce((sum, r) => sum + r.amount, 0);
-    const totalPaid = rents.reduce((sum, r) => sum + r.amountPaid, 0);
+    const rents = await this.rentModel.findAll({
+      where: { propertyId },
+    });
+
+    const totalRent = rents.reduce((sum, r) => sum + Number(r.amount), 0);
+    const totalPaid = rents.reduce((sum, r) => sum + Number(r.amountPaid), 0);
     const pending = rents.filter((r) => r.status === 'pending').length;
     const overdue = rents.filter((r) => r.status === 'overdue').length;
     const paid = rents.filter((r) => r.status === 'paid').length;

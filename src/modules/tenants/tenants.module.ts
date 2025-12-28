@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { SequelizeModule } from '@nestjs/sequelize';
 import { TenantsService } from './tenants.service';
 import { TenantsController } from './tenants.controller';
-import { Tenant, TenantSchema } from './entities/tenant.entity';
+import { Tenant } from '@/database/sql/entities/tenant.entity';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Tenant.name, schema: TenantSchema }])],
+  imports: [SequelizeModule.forFeature([Tenant])],
   controllers: [TenantsController],
   providers: [TenantsService],
   exports: [TenantsService],
