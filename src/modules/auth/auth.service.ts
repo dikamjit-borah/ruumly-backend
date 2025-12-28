@@ -1,51 +1,51 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
-import { UsersService } from '@/modules/users/users.service';
+import { OwnersService } from '@/modules/owners/owners.service';
 import { AuthDto } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly usersService: UsersService,
+    private readonly ownersService: OwnersService,
   ) {}
 
   async validateUser(email: string, password: string) {
-    const user = await this.usersService.findByEmail(email);
-    if (user && (await this.comparePasswords(password, user.password))) {
-      const { password, ...result } = user.get({ plain: true });
+    const owner = await this.ownersService.findByEmail(email);
+    if (owner && (await this.comparePasswords(password, owner.password))) {
+      const { password, ...result } = owner.get({ plain: true });
       return result;
     }
     return null;
   }
 
-  async login(user: AuthDto) {
-    const validatedUser = await this.validateUser(user.email, user.password);
-    if (!validatedUser) {
+  async login(owner: AuthDto) {
+    const validatedOwner = await this.validateUser(owner.email, owner.password);
+    if (!validatedOwner) {
       throw new Error('Invalid credentials');
     }
 
     const payload = {
-      email: validatedUser.email,
-      sub: validatedUser.id,
+      email: validatedOwner.email,
+      sub: validatedOwner.id,
     };
 
     return {
       access_token: this.jwtService.sign(payload),
-      user: validatedUser,
+      owner: validatedOwner,
     };
   }
 
   async register(email: string, password: string, name: string) {
     const hashedPassword = await this.hashPassword(password);
-    const user = await this.usersService.create({
+    const owner = await this.ownersService.create({
       email,
       password: hashedPassword,
       name,
     });
 
-    const { password: _, ...result } = user.get({ plain: true });
+    const { password: _, ...result } = owner.get({ plain: true });
     const payload = {
       email: result.email,
       sub: result.id,
@@ -53,7 +53,7 @@ export class AuthService {
 
     return {
       access_token: this.jwtService.sign(payload),
-      user: result,
+      owner: result,
     };
   }
 
