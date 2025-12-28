@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { MongooseModule } from '@nestjs/mongoose';
 import { envConfig } from '@/config/env.config';
-import { LogSchema } from '@/database/logging/log.entity';
+//import { LogSchema } from '@/database/logging/log.entity';
 
 // Sequelize SQL Entities
 import { User } from '@/database/sql/entities/user.entity';
@@ -15,7 +15,7 @@ import { Rent } from '@/database/sql/entities/rent.entity';
   imports: [
     // MongoDB - For Logging
     MongooseModule.forRoot(envConfig.database.mongodb.uri),
-    MongooseModule.forFeature([{ name: 'Log', schema: LogSchema }]),
+    //MongooseModule.forFeature([{ name: 'Log', schema: LogSchema }]),
 
     // Sequelize MySQL - For Primary Data Storage
     SequelizeModule.forRoot({
@@ -27,7 +27,7 @@ import { Rent } from '@/database/sql/entities/rent.entity';
       database: envConfig.database.database,
       models: [User, Property, Room, Tenant, Rent],
       autoLoadModels: true,
-      synchronize: envConfig.database.synchronize,
+      synchronize: false,
       logging: envConfig.database.logging ? console.log : false,
       pool: envConfig.database.pool,
     }),
