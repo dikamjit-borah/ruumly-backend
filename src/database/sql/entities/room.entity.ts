@@ -6,6 +6,7 @@ import {
   ForeignKey,
   BelongsTo,
   HasMany,
+  HasOne,
   CreatedAt,
   UpdatedAt,
 } from 'sequelize-typescript';
@@ -97,8 +98,8 @@ export class Room extends Model {
   })
   currentTenantId: string;
 
-  @BelongsTo(() => Tenant, 'currentTenantId')
-  currentTenant: Tenant;
+  @HasOne(() => Tenant, 'roomId')
+  tenant: Tenant;
 
   @Column({
     type: DataType.DECIMAL(10, 2),

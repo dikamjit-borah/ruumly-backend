@@ -1,4 +1,14 @@
-import { Column, DataType, Model, Table, Unique, CreatedAt, UpdatedAt } from 'sequelize-typescript';
+import {
+  Column,
+  DataType,
+  Model,
+  Table,
+  Unique,
+  CreatedAt,
+  UpdatedAt,
+  HasMany,
+} from 'sequelize-typescript';
+import { Property } from './property.entity';
 
 @Table({
   tableName: 'owners',
@@ -61,4 +71,7 @@ export class Owner extends Model {
     type: DataType.DATE,
   })
   updatedAt: Date;
+
+  @HasMany(() => Property, 'ownerId')
+  properties: Property[];
 }

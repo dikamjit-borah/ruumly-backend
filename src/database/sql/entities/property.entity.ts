@@ -9,7 +9,7 @@ import {
   CreatedAt,
   UpdatedAt,
 } from 'sequelize-typescript';
-import { User } from './user.entity';
+import { Owner } from './owner.entity';
 import { Room } from './room.entity';
 
 @Table({
@@ -79,15 +79,15 @@ export class Property extends Model {
   })
   status: string;
 
-  @ForeignKey(() => User)
+  @ForeignKey(() => Owner)
   @Column({
     type: DataType.UUID,
     allowNull: false,
   })
   ownerId: string;
 
-  @BelongsTo(() => User, 'ownerId')
-  owner: User;
+  @BelongsTo(() => Owner, 'ownerId')
+  owner: Owner;
 
   @HasMany(() => Room, 'propertyId')
   rooms: Room[];

@@ -11,7 +11,6 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript';
 import { Room } from './room.entity';
-import { Property } from './property.entity';
 import { Rent } from './rent.entity';
 
 @Table({
@@ -61,16 +60,6 @@ export class Tenant extends Model {
 
   @BelongsTo(() => Room, 'roomId')
   room: Room;
-
-  @ForeignKey(() => Property)
-  @Column({
-    type: DataType.UUID,
-    allowNull: true,
-  })
-  propertyId: string;
-
-  @BelongsTo(() => Property, 'propertyId')
-  property: Property;
 
   @Column({
     type: DataType.STRING(50),
