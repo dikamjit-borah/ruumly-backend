@@ -14,7 +14,7 @@ export class AuthService {
   async validateUser(email: string, password: string) {
     const user = await this.usersService.findByEmail(email);
     if (user && (await this.comparePasswords(password, user.password))) {
-      const { password, ...result } = user.toObject();
+      const { password, ...result } = user.get({ plain: true });
       return result;
     }
     return null;
@@ -28,7 +28,7 @@ export class AuthService {
 
     const payload = {
       email: validatedUser.email,
-      sub: validatedUser._id,
+      sub: validatedUser.id,
     };
 
     return {
@@ -45,10 +45,10 @@ export class AuthService {
       name,
     });
 
-    const { password: _, ...result } = user.toObject();
+    const { password: _, ...result } = user.get({ plain: true });
     const payload = {
       email: result.email,
-      sub: result._id,
+      sub: result.id,
     };
 
     return {
