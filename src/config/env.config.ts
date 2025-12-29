@@ -55,7 +55,11 @@ export const envConfig = {
     dir: process.env.LOG_DIR || 'logs',
   },
   cors: {
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3001',
+    origin: process.env.CORS_ORIGIN?.split(',') || [
+      'http://localhost:3001',
+      'http://localhost:3000',
+      'https://ruumly-frontend-fufeo3dhe-dikamjit-borahs-projects.vercel.app',
+    ],
     credentials: process.env.CORS_CREDENTIALS === 'true',
     optionsSuccessStatus: 200,
   },
