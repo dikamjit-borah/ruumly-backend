@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { OwnersService } from '@/modules/owners/owners.service';
@@ -103,6 +103,9 @@ export class AuthService {
         owner: ownerData,
       };
     } catch (error) {
+      Logger.error('Firebase sign-in error:', error);
+      Logger.error(error.message);
+      console.error(`Firebase sign-in error: ${JSON.stringify(error)}`);
       throw new BadRequestException('Firebase authentication failed');
     }
   }
