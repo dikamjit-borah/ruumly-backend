@@ -27,8 +27,8 @@ import { Rent } from '@/database/sql/entities/rent.entity';
       database: envConfig.database.database,
       models: [Owner, Property, Room, Tenant, Rent],
       autoLoadModels: true,
-      synchronize: false,
-      logging: envConfig.database.logging ? console.log : false,
+      synchronize: envConfig.database.synchronize == 'true',
+      logging: envConfig.database.logging == 'true' ? console.log : false,
       pool: envConfig.database.pool,
     }),
 
