@@ -33,6 +33,7 @@ export class Owner extends Model {
   @Column({
     type: DataType.STRING(255),
     allowNull: true,
+    defaultValue: '', // Empty string default for Firebase users without password
   })
   password: string;
 
