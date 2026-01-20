@@ -58,10 +58,11 @@ export const envConfig = {
     origin: process.env.CORS_ORIGIN?.split(',') || [
       'http://localhost:3001',
       'http://localhost:3000',
+      'https://ruumly-frontend.vercel.app',
       'https://ruumly-frontend-fufeo3dhe-dikamjit-borahs-projects.vercel.app',
       'https://ruumly-frontend-acea9t5bm-dikamjit-borahs-projects.vercel.app'
     ],
-    credentials: process.env.CORS_CREDENTIALS === 'true',
+    credentials: true,
     optionsSuccessStatus: 200,
   },
 };
