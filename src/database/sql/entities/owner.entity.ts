@@ -32,7 +32,7 @@ export class Owner extends Model {
 
   @Column({
     type: DataType.STRING(255),
-    allowNull: false,
+    allowNull: true,
   })
   password: string;
 

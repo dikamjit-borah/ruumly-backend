@@ -96,7 +96,7 @@ export class AuthService {
       };
 
       const ownerData = owner.get({ plain: true });
-      delete ownerData.password;
+      //delete ownerData.password;
 
       return {
         access_token: this.jwtService.sign(payload),
