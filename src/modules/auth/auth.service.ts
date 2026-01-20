@@ -86,6 +86,7 @@ export class AuthService {
           email,
           name,
           firebaseUid,
+          password: null, // Firebase users don't have a password
         } as any);
       }
 
